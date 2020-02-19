@@ -16,7 +16,7 @@ void ofApp::update(){
 	if (grab.isFrameNew()) {
 		//cont.setTargetColor(color);
 		cont.setThreshold(60);
-		cont.findContours(grab);
+		cont.findContours(grab); //look into settings chnages for cont
 		//message.addBoolArg(playing);
 		//oscx = ofMap(cont.getCentroid(0).x, 0, ofGetWidth(), 0.0f, 200.0f, true);
 		//oscy = ofMap(cont.getCentroid(0).y, 0, ofGetHeight(), 1.0f, 0.0f, true);
