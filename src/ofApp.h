@@ -33,6 +33,7 @@ class ofApp : public ofBaseApp{
 		ofxCvGrayscaleImage background;
 		ofxCvGrayscaleImage difference;
 		ofxCvGrayscaleImage temp;
+		bool bLearnBackground;
 		float oscx = 0.0f;
 		float oscy = 0.0f;
 		bool playing = false;
