@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxOsc.h"
 #include "ofxCv.h"
+#include "ofxOpenCv.h"
 
 #define PORT 9001
 #define HOST "localhost"
@@ -26,8 +27,12 @@ class ofApp : public ofBaseApp{
 		//void dragEvent(ofDragInfo dragInfo);
 		//void gotMessage(ofMessage msg);
 		void changeCam(int camera);
+		//void message(Blob b);
 		
 		ofxOscSender osc;
+		ofxCvGrayscaleImage background;
+		ofxCvGrayscaleImage difference;
+		ofxCvGrayscaleImage temp;
 		float oscx = 0.0f;
 		float oscy = 0.0f;
 		bool playing = false;
