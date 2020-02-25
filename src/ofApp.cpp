@@ -5,47 +5,57 @@ void ofApp::setup(){
 	ofSetWindowTitle("roomTrack");
 	ofSetBackgroundColor(0);
 	osc.setup(HOST, PORT);
+	grab.setVerbose(true);
 	grab.setDeviceID(0);
 	grab.setup(1024, 768);
-	background.allocate(ofGetWidth(), ofGetHeight());
-	difference.allocate(ofGetWidth(), ofGetHeight());
-	temp.allocate(ofGetWidth(), ofGetHeight());
-	grab.videoSettings();
-	cont.setMinAreaRadius(20);
-	//cont.setMaxAreaRadius(150);
+	colorImg.allocate(ofGetWidth(), ofGetHeight());
+	grayImage.allocate(ofGetWidth(), ofGetHeight());
+	grayBg.allocate(ofGetWidth(), ofGetHeight());
+	grayDiff.allocate(ofGetWidth(), ofGetHeight());
+
 	bLearnBackground = true;
+	threshold = 80;
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-	//ofxOscMessage message;
+	bool bNewFrame = false;
+	threshold = ofMap(ofGetMouseX(), 0, ofGetWidth(), 0, 255);
+	
 	grab.update();
-	if (grab.isFrameNew()) {
-		//cont.setTargetColor(color);
-		cont.setThreshold(ofMap(ofGetMouseX(), 0, ofGetWidth(), 0, 255));
-		temp.setFromPixels(grab.getPixels());
-		if (bLearnBackground == true) {
-			background = temp;		// the = sign copys the pixels from grayImage into grayBg (operator overloading)
+	bNewFrame = grab.isFrameNew();
+
+	if (bNewFrame) {
+		colorImg.setFromPixels(grab.getPixels());
+		grayImage = colorImg;
+		if (bLearnBackground) {
+			grayBg = grayImage;
 			bLearnBackground = false;
 		}
-		difference.absDiff(background, temp);
-		cont.findContours(difference); //look into settings chnages for cont
-		cont.setFindHoles(true);
-		//message.addBoolArg(playing);
-		//oscx = ofMap(cont.getCentroid(0).x, 0, ofGetWidth(), 0.0f, 200.0f, true);
-		//oscy = ofMap(cont.getCentroid(0).y, 0, ofGetHeight(), 1.0f, 0.0f, true);
-		//message.addFloatArg(oscx);
-		//message.addFloatArg(oscy);
+
+		grayDiff.absDiff(grayBg, grayImage);
+		grayDiff.threshold(threshold);
+
+		cont.findContours(grayDiff, 20, ofGetWidth() * ofGetHeight(), 10, true);
 	}
-	//osc.sendMessage(message, false);
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
 	//will not draw in implimentation
 	ofSetColor(255);
-	grab.draw(0, 0);
-	cont.draw();
+	colorImg.draw(0, 0);
+	for (int i = 0; i < cont.nBlobs; i++) {
+		cont.blobs[i].draw();
+
+		// draw over the centroid if the blob is a hole
+		ofSetColor(255);
+		if (cont.blobs[i].hole) {
+			ofDrawBitmapString("hole",
+				cont.blobs[i].boundingRect.getCenter().x,
+				cont.blobs[i].boundingRect.getCenter().y);
+		}
+	}
 }
 
 //--------------------------------------------------------------
@@ -58,8 +68,18 @@ void ofApp::keyPressed(int key){
 			changeCam(cam);
 		}
 	}
-	if (key == 's') {
+	switch (key) {
+	case ' ':
 		bLearnBackground = true;
+		break;
+	case '+':
+		threshold++;
+		if (threshold > 255) threshold = 255;
+		break;
+	case '-':
+		threshold--;
+		if (threshold < 0) threshold = 0;
+		break;
 	}
 }
 

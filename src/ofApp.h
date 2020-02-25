@@ -2,7 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxOsc.h"
-#include "ofxCv.h"
+//#include "ofxCv.h"
 #include "ofxOpenCv.h"
 
 #define PORT 9001
@@ -30,17 +30,19 @@ class ofApp : public ofBaseApp{
 		//void message(Blob b);
 		
 		ofxOscSender osc;
-		ofxCvGrayscaleImage background;
-		ofxCvGrayscaleImage difference;
-		ofxCvGrayscaleImage temp;
+		ofxCvColorImage	colorImg;
+		ofxCvGrayscaleImage grayImage;
+		ofxCvGrayscaleImage grayBg;
+		ofxCvGrayscaleImage grayDiff;
+		ofxCvContourFinder cont;
+		ofVideoGrabber grab;
 		bool bLearnBackground;
+		int threshold;
+
 		float oscx = 0.0f;
 		float oscy = 0.0f;
 		bool playing = false;
 		bool switched = false;
-		ofVideoGrabber grab;
-		ofxCv::ContourFinder cont;
-		//ofColor color;
 		int num = 1;
 		int cam = 0;
 };
